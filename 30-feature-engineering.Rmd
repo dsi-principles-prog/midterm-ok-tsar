@@ -1,0 +1,232 @@
+---
+title: "30-feature-engineeering"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+# Engineered Feature 1 --- mean by state
+
+Lets make a feature that finds the mean of some input variable or variables by state for the s_data data frame. The output of this feature should be a dataframe with the first column being the state, followed by the state mean numbers for the variable or variables chosen. (i.e. The feature should be able to find the mean by state of "killed", "wounded", or "wounded and killed" - Then return a dataframe whose first column is state, the next column(s) is the meaned variable or variables and then all the other variables after that.).
+
+This feature allows me to look any numerical variable's (or group of variables') mean in a grouping by state! This shows me the states' average shooting fatalities and/or wounded numbers.  
+
+To make this feature we need to within the feature group by state then find the mean of the variables given (ungroup then to aviod problems down the line). Then order the output in the order described above.
+```{r mean_by_state_feature}
+mean_by_state <- function(df, vars) {
+  df %>% 
+    group_by(state) %>% 
+    mutate_at(vars, list(statemean = function(x, na.rm = FALSE) {mean(x, na.rm = TRUE)})) %>% 
+    ungroup() %>% 
+    select(state, contains("statemean"), everything())
+}
+```
+
+## Testing Engineered Feature 1
+#### test 1: check that mean by state of wounded variable is between 0 and 10 (i.e. reasonable)
+```{r mean_by_state_testing_1}
+s_data %>% mean_by_state(c("killed","wounded")) %>%
+  assert(within_bounds(0, 10), 'statemean')
+```
+#### test 2: check that only all old columns and the new column are there
+```{r mean_by_state_testing_2}
+s_data %>% mean_by_state(c("wounded")) %>%
+  assert_colnames(
+    c(
+      "state",
+      "statemean",
+      "date",
+      "name_semicolon_delimited",
+      "killed",
+      "wounded",
+      "city",
+      "sources_semicolon_delimited"
+    ),
+    only_colnames=TRUE
+  )
+```
+#### test 3: check that mean by state of killed and wounded can be calculated at same time and that mean killed by state is a reasonable number of between 0 and 10
+```{r mean_by_state_testing_3}
+s_data %>% mean_by_state(c("killed","wounded")) %>%
+  assert(within_bounds(0, 10), 'killed_statemean')
+```
+#### test 4: check that only all old columns and the new columns are there
+```{r mean_by_state_testing_4}
+s_data %>% mean_by_state(c("killed","wounded")) %>%
+  assert_colnames(
+    c(
+      "state",
+      "killed_statemean",
+      "wounded_statemean",
+      "date",
+      "name_semicolon_delimited",
+      "killed",
+      "wounded",
+      "city",
+      "sources_semicolon_delimited"
+    )
+  )
+```
+
+Now remember that the goal of this is to move twords getting to x deaths/fatalities per 1 million per state! To do this we must have the population levels of each state joined with the shooting data! For this I will join the population and shooting datasets below.
+
+
+
+
+# Engineered Feature 2 --- join p_data onto s_data
+
+I want to take a function that has the inputs of the two data frames I want to join together - the first data frame being the the one to which the second is being left joined to. The output should be the first data frame with the added few columns from the second data frame. Also I would like state_name to be next to the state (abreviation) column and the population column to be next to the other numeric columns (wounded and killed) and then all the other variables after that.
+
+This joining of the dataframes will allow me analyze the shooting data with population taken into account. The reason I am using a function for this is if I wanted to do this same analysis for a different years - I wouldnt have to re-join the data frames by hand, I could just merge them with this function (given that they are taken from the same sources with same column names). 
+
+To make this feature we need to change the state abreviation column name for the joined df to match that of the other df. Then we have to join them on that updated column name. Then order the output in the order described above.
+```{r merge_dfs_feature}
+merge_dfs <- function(base_df, added_df) {
+  colnames(added_df)[colnames(added_df) == "state_abrv"] <- "state"
+  base_df %>%
+    left_join(added_df, by = "state") %>%
+    select(state,
+           state_name,
+           killed,
+           wounded,
+           population,
+           everything())
+}
+```
+
+## Testing Engineered Feature 2
+#### test 1: check that the population exists in the df and is reasonable (i.e. between 0 and 330 million)
+```{r merge_dfs_testing_1}
+merge_dfs(s_data, p_data) %>%
+  assert(within_bounds(0, 330000000), 'population')
+```
+#### test 2: check that only all old columns and the new columns are there
+```{r merge_dfs_testing_2}
+merge_dfs(s_data, p_data) %>%
+  assert_colnames(
+    c(
+      "state",
+      "state_name",
+      "killed",
+      "wounded",
+      "population",
+      "date",
+      "name_semicolon_delimited",
+      "city",
+      "sources_semicolon_delimited"
+    )
+  )
+```
+
+The next step to getting twords the deaths/injuries per 1 million by state is to find the total fatalities and injuries per state in a new feature below!
+
+
+
+# Engineered Feature 3 --- sum by state
+
+Lets make a feature that finds the sum of some input variable or variables by state for a data frame. The output of this feature should be a dataframe with the first column being the state, followed by the state sum numbers for the variable or variables chosen. (i.e. The feature should be able to find the sum by state of "killed", "wounded", or "wounded and killed" - Then return a dataframe whose first column is state, the next column(s) is the summed variable or variables and then all the other variables after that.).
+
+This feature allows me to look any numerical variable's (or group of variables') sum in a grouping by state! This shows me the states' sum shooting fatalities and/or wounded numbers.
+
+To make this feature we need to - within the feature - group by state then find the sum of the variables given. Then order the output in the order described above.
+HINT: ungroup when you are finished as it may become a problem later if you don't!
+```{r sum_by_state_feature}
+sum_by_state <- function() {
+  
+}
+```
+
+## Testing Engineered Feature 3
+#### test 1: check that the killed amount sums in the df and is reasonable (i.e. between 0 and 1000)
+```{r sum_by_state_testing_1}
+s_data %>% sum_by_state(c("killed", "wounded")) %>% 
+  assert(within_bounds(0, 10000), 'killed')
+```
+#### test 2: check that only all old columns and the new columns are there
+```{r sum_by_state_testing_2}
+s_data %>% sum_by_state(c("killed", "wounded")) %>%
+  assert_colnames(
+    c(
+      "state",
+      "killed_state_sum",
+      "wounded_state_sum",
+      "date",
+      "name_semicolon_delimited",
+      "killed",
+      "wounded",
+      "city",
+      "sources_semicolon_delimited"
+    )
+  )
+```
+#### test 3: check that sum_by_state feature is compatable with the merge_dfs feature
+```{r sum_by_state_testing_3}
+s_data %>% merge_dfs(p_data) %>% sum_by_state(c("killed", "wounded")) %>%
+  assert_colnames(
+    c(
+      "state",
+      "killed_state_sum",
+      "wounded_state_sum",
+      "state_name",
+      "killed",
+      "wounded",
+      "population",
+      "date",
+      "name_semicolon_delimited",
+      "city",
+      "sources_semicolon_delimited"
+    )
+  )
+```
+
+
+
+
+
+
+
+# Engineered Feature 4 --- death/injury per 1 Million by state
+
+Lets make a feature that takes the input of a data frame (HINT: a combined one that uses the features made above) and calculates the amount of deaths and injuries per 1 million residents by state! This will give us a more accurate picture of safe and unsafe states! The feature should be able to find the killed per 1 mill and injured per 1 mill residents by state - Then return a dataframe whose first column is state, the next columns are the killed and injured per 1 million variables and then all the other variables after that.
+
+To make this feature we need to - within the feature - group by state calculate the per million values then order the output in the order described above. Make sure to ungroup when done
+
+*Name the variables: killed_per_1M and wounded_per_1M
+```{r per_1M_by_state}
+per_1M_by_state <- function() {
+  
+}
+```
+
+## Testing Engineered Feature 4
+#### test 1: check that the killed and wounded per 1M are positive and reasonables (i.e. between 0 and 1000)
+```{r per_1M_testing_1}
+s_data %>% merge_dfs(p_data) %>% sum_by_state(c("killed", "wounded")) %>% per_1M_by_state() %>% 
+  assert(within_bounds(0, 1000), 'killed_per_1M', "wounded_per_1M")
+```
+#### test 2: check that the killed and wounded per 1M are positive and reasonables (i.e. between 0 and 1000)
+```{r per_1M_testing_2}
+s_data %>% merge_dfs(p_data) %>% sum_by_state(c("killed", "wounded")) %>% per_1M_by_state() %>%
+  assert_colnames(
+    c(
+      "state",
+      "killed_per_1M",
+      "wounded_per_1M",
+      "killed_state_sum",
+      "wounded_state_sum",
+      "state_name",
+      "killed",
+      "wounded",
+      "population",
+      "date",
+      "name_semicolon_delimited",
+      "city",
+      "sources_semicolon_delimited"
+    )
+  )
+```
+
+
+
+
+
