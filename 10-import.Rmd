@@ -5,14 +5,6 @@ output:
   html_document: default
 ---
 
-I will look at 2018 mass shooting data that we used in previous class. I would like to see what states seem to have the biggest problems with this. I would also like to look at the deadliness/injurty rate of shootings relative to other shootings within each state and between the states. 
-
-To be able to better compare shooting data between states taking into account their population differences I will need to look at state population data along with the shooting data.
-
-Hopefully this can help me identify states where shootings are a large problem and where they are less of a problem. Additionally I want to see what are the deadliest/injury fullest (?) shootings.
-
-A great way to compare states in terms of how deadly/injury prone their shootings are would be if we looked at average death/injury rate. An even better way would be to look at deaths/injuries per 1 million people. This gives puts the shootings into perspectives because it takes into acount the amount of shootings in each state. For example, it would be better to live in a state thats had one shooting where 5 died, rather than one of similar size thats had fifty shootings where 4 have died. Altough the average would be lower - the deaths per 1 million would be much higher. A feature to find average deaths/injuries will be the first step into looking into the mass shooting rates as it is a commmon statistic to calculate. My features will build to calculate deaths/injuries per 1 million people by state!
-
 #### import librarys
 ```{r library_setup}
 library(tidyverse)
@@ -23,6 +15,15 @@ library(ggplot2)
 library(assertable)
 ```
 
+#### main question and data
+
+I will look at 2018 mass shooting data that we used in previous class. I would like to see what states seem to have the biggest problems with this. I would also like to look at the deadliness/injurty rate of shootings relative to other shootings within each state and between the states. 
+
+To be able to better compare shooting data between states taking into account their population differences I will need to look at state population data along with the shooting data.
+
+Hopefully this can help me identify states where shootings are a large problem and where they are less of a problem. Additionally I want to see what are the deadliest/injury fullest (?) shootings.
+
+A great way to compare states in terms of how deadly/injury prone their shootings are would be if we looked at average death/injury rate. An even better way would be to look at deaths/injuries per 1 million people. This gives puts the shootings into perspectives because it takes into acount the amount of shootings in each state. For example, it would be better to live in a state thats had one shooting where 5 died, rather than one of similar size thats had fifty shootings where 4 have died. Altough the average would be lower - the deaths per 1 million would be much higher. A feature to find average deaths/injuries will be the first step into looking into the mass shooting rates as it is a commmon statistic to calculate. My features will build to calculate deaths/injuries per 1 million people by state!
 
 #### import shooting and population data
 

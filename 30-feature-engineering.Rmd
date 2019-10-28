@@ -130,6 +130,7 @@ This feature allows me to look any numerical variable's (or group of variables')
 
 To make this feature we need to - within the feature - group by state then find the sum of the variables given. Then order the output in the order described above.
 HINT: ungroup when you are finished as it may become a problem later if you don't!
+HINT: check the assertr statement (test 2) for naming conventions on the output variable names!
 ```{r sum_by_state_feature}
 sum_by_state <- function() {
   
@@ -204,7 +205,7 @@ per_1M_by_state <- function() {
 s_data %>% merge_dfs(p_data) %>% sum_by_state(c("killed", "wounded")) %>% per_1M_by_state() %>% 
   assert(within_bounds(0, 1000), 'killed_per_1M', "wounded_per_1M")
 ```
-#### test 2: check that the killed and wounded per 1M are positive and reasonables (i.e. between 0 and 1000)
+#### test 2: check that only all old columns and the new columns are there
 ```{r per_1M_testing_2}
 s_data %>% merge_dfs(p_data) %>% sum_by_state(c("killed", "wounded")) %>% per_1M_by_state() %>%
   assert_colnames(

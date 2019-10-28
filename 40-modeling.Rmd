@@ -3,32 +3,40 @@ title: "40-modeling"
 output: html_document
 ---
 
-```{r}
-s_data
-p_data
-```
+#### model setup
 
+set up model starting from un cleaned data and finishing off with a df that contains all feature engineered features
 ```{r}
-s_data %>% mean_by_state(c("killed","wounded"))
-```
-
-```{r}
-s_data %>% merge_dfs(p_data) %>% mean_by_state(c("killed","wounded"))
-```
-
-```{r}
-s_data %>% 
-  merge_dfs(p_data) %>% 
-  mean_by_state(c("killed","wounded")) %>% 
-  sum_by_state(c("killed", "wounded"))
-```
-
-```{r}
-s_data %>% 
+model1 <- s_data %>% 
   merge_dfs(p_data) %>% 
   mean_by_state(c("killed","wounded")) %>% 
   sum_by_state(c("killed", "wounded")) %>% 
   per_1M_by_state()
 ```
 
+#### test model setup
+test to make sure all the feature engineered columns are in the model setup
+```{r}
+model1 %>%
+  assert_colnames(
+    c(
+      "state",
+      "killed_per_1M",
+      "wounded_per_1M",
+      "killed_state_sum",
+      "wounded_state_sum",
+      "killed_statemean",
+      "wounded_statemean",
+      "state_name",
+      "killed",
+      "wounded",
+      "population",
+      "date",
+      "name_semicolon_delimited",
+      "city",
+      "sources_semicolon_delimited"
+    ),
+    only_colnames=TRUE
+  )
+```
 
