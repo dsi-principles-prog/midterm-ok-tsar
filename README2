@@ -1,0 +1,16 @@
+Data Description
+ 
+The data comes from 2018 shooting data and 2018 state population data.
+The 2018 shooting data has the following variables
+ - date: date of shooting in charecter format
+ - name_semicolon_delimited: name of shooter and some information on the victims in charecter format 
+ - killed: the number killed in shooting as double
+ - wounded: the number wounded in shooting as double
+ - city: city of shooting in charecter format
+ - state: state abreviation in charecter format
+ - sources_semicolon_delimited: the source of shooting news article in charecter format
+ 
+ The 2018 poulation data has the following variables
+  - STATE NAME: the full name of the state as charecter data
+  - STATE ABRV: state abreviation in charecter format
+  - POPULATION: the state population as double
