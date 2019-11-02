@@ -26,7 +26,7 @@ mean_by_state <- function(df, vars) {
 #### test 1: check that mean by state of wounded variable is between 0 and 10 (i.e. reasonable)
 ```{r mean_by_state_testing_1}
 s_data %>% mean_by_state(c("killed","wounded")) %>%
-  assert(within_bounds(0, 10), 'statemean')
+  assert(within_bounds(0, 10), "statemean")
 ```
 #### test 2: check that only all old columns and the new column are there
 ```{r mean_by_state_testing_2}
@@ -132,9 +132,14 @@ To make this feature we need to - within the feature - group by state then find 
 HINT: ungroup when you are finished as it may become a problem later if you don't!
 HINT: check the assertr statement (test 2) for naming conventions on the output variable names!
 ```{r sum_by_state_feature}
-sum_by_state <- function() {
-  
+sum_by_state <- function(data, var) {
+    data%>% 
+    group_by(state) %>% 
+    mutate_at(var, list(state_sum = function(x, na.rm = FALSE) {sum(x, na.rm = TRUE)}))%>%
+    ungroup() %>% 
+    select(state, contains("state_sum"), everything())
 }
+
 ```
 
 ## Testing Engineered Feature 3
